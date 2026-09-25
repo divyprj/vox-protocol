@@ -7,10 +7,10 @@
 [![Render](https://img.shields.io/badge/Deploy%20on-Render-46E3B7.svg)](https://render.com/)
 [![Railway](https://img.shields.io/badge/Deploy%20on-Railway-0B0D0E.svg)](https://railway.app/)
 [![Zero-Key](https://img.shields.io/badge/API%20Keys-Zero%20(100%25%20Free)-30d158.svg)]()
-[![Design](https://img.shields.io/badge/UI%20Design-Apple%20Pro%20Workstation-black.svg)]()
+[![Design](https://img.shields.io/badge/UI%20Design-Anti--AI%20Dark%20Slate-black.svg)]()
 
 > **Submission for Web3Task Assignment Evaluation**  
-> An enterprise-grade, commercial Text-to-Speech (TTS) Voice AI platform delivering ultra-realistic, low-latency multilingual speech synthesis with studio-grade male & female voices, Romanized Indic (Hinglish) transliteration, acoustic tuning, Apple Pro Audio workstation UI, and an automated benchmark evaluation suite.
+> An enterprise-grade, commercial Text-to-Speech (TTS) Voice AI platform delivering ultra-realistic, low-latency multilingual speech synthesis with studio-grade male & female voices, Romanized Indic (Hinglish) transliteration, acoustic tuning, high-contrast dark slate workstation UI, and an automated benchmark evaluation suite.
 
 ---
 
@@ -77,7 +77,7 @@ Instantly terminates backend processes and frees port 8000 cleanly.
 | **Model Type** | Text-to-Speech Voice AI | Microsoft Edge Neural Vocoder Engine (320+ global voices) | **100% Complete** |
 | **Multilingual** | Multiple Locales | 🇺🇸 English (US), 🇬🇧 English (UK), 🇮🇳 English (IN), 🇮🇳 Hindi, 🇪🇸 Spanish, 🇫🇷 French, 🇩🇪 German, 🇯🇵 Japanese, 🇨🇳 Mandarin | **100% Complete** |
 | **Voice Diversity**| At least 1 Male & 1 Female per language | Curated Studio Male (`♂`) & Female (`♀`) voice models with instant 3-second preview auditioning | **100% Complete** |
-| **Interactive UI** | Non-CMD, Modern SaaS Interface | **Apple Pro Audio Workstation** (graphite slate `#08090b`, frosted toolbar, Apple Blue `#0a84ff` accents, Canvas waveform visualizer) | **100% Complete** |
+| **Interactive UI** | Non-CMD, Modern SaaS Interface | Dark Slate Workstation (`#090a0d`, `#11141b`, `#d5ff63` electric lime accent, Canvas waveform visualizer) | **100% Complete** |
 | **Neural Auto-Translate**| Universal Cross-Lingual Translation | Real-time Auto-Translate to target voice language, including Romanized Indic (Hinglish like `"mera naam divyansh hai"`) to native Devanagari/target script | **100% Complete** |
 | **Acoustic Tuning**| Speed, Pitch, Volume Controls | Real-time pacing (0.5x–2.0x), Pitch shift (-50Hz to +50Hz), and Volume gain (0–100%) | **100% Complete** |
 | **Audio Export** | High fidelity download | Instant MP3 download, copy transcript, and persistent SQLite library | **100% Complete** |
@@ -88,8 +88,8 @@ Instantly terminates backend processes and frees port 8000 cleanly.
 
 ## 🖥️ Platform Feature Breakdown
 
-### 1. Studio Workstation (Apple Pro Audio Design)
-- **Aesthetic**: Restrained graphite surface (`#08090b`, `#14161a`), specular 1px borders, frosted glass toolbar (`backdrop-filter: blur(28px)`), Apple System Blue (`#0a84ff`) functional accents.
+### 1. Studio Workstation (Dark Slate Anti-AI Theme)
+- **Aesthetic**: Deep dark slate surface (`#090a0d`, `#11141b`), electric lime (`#d5ff63`) accents, high contrast typography, zero generic AI cliches.
 - **Script Editor**: Rich multi-line script editor with live character counter (5,000 char capacity), word counter, and clear button.
 - **Intelligent Auto-Translate & Transliteration**:
   - Automatically translates any script (English, Spanish, French, German, Japanese, Chinese, or Romanized Hindi/Hinglish) into the native language and script of the chosen voice.

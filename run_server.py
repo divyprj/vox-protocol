@@ -1,5 +1,5 @@
 """
-VOX//PROTOCOL — Neural Voice Studio
+VOX//PROTOCOL :  Neural Voice Studio
 Production SaaS Server Launcher
 """
 
@@ -31,7 +31,7 @@ def open_browser():
 
 def main():
     print("=" * 64)
-    print("  VOX//PROTOCOL — NEURAL VOICE STUDIO (v2.1.0)")
+    print("  VOX//PROTOCOL :  NEURAL VOICE STUDIO (v2.1.0)")
     print("  Enterprise Text-to-Speech & Voice AI Platform")
     print("=" * 64)
     print(f"  • Engine: Edge Neural Voice Core (320+ Studio Voices)")

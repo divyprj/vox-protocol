@@ -1,5 +1,5 @@
 """
-VOX//PROTOCOL — Neural Voice Studio
+VOX//PROTOCOL :  Neural Voice Studio
 FastAPI Backend Application
 """
 

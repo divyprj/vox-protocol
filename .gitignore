@@ -50,6 +50,7 @@ stt_benchmark/
 transcribe.py
 run_benchmark.py
 tests/
+capture_screens.py
 
 # IDE / OS Files
 .vscode/

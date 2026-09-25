@@ -1,5 +1,5 @@
 """
-VOX//PROTOCOL — Multilingual Neural Translation & Transliteration Engine
+VOX//PROTOCOL :  Multilingual Neural Translation & Transliteration Engine
 Implements zero-API-key cross-lingual translation with resilient multi-gateway failover,
 smart Romanized-Indic (Hinglish) transliteration, and high-availability caching.
 """

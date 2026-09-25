@@ -1,5 +1,5 @@
 /**
- * VOX//PROTOCOL — Neural Voice Studio Client Application
+ * VOX//PROTOCOL :  Neural Voice Studio Client Application
  * Production-Grade Reactive Frontend Controller
  */
 

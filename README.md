@@ -14,6 +14,8 @@ VOX//PROTOCOL requires no paid API credentials, no dedicated GPU, and no local n
 - **Interactive OpenAPI Documentation**: [https://vox-protocol.onrender.com/docs](https://vox-protocol.onrender.com/docs)
 - **GitHub Repository**: [https://github.com/divyprj/vox-protocol](https://github.com/divyprj/vox-protocol)
 
+![VOX Protocol Studio Workstation](docs/screenshots/01_studio_workstation.png)
+
 ---
 
 ## Platform Overview
@@ -75,22 +77,12 @@ Voice metadata includes:
 
 Each supported voice can be auditioned through a short native-language preview. The preview system allows users to compare voices before generating a complete audio file.
 
-Typical workflow:
-
-```text
-Select language
-    |
-    v
-Filter by gender
-    |
-    v
-Preview voice (3s native tongue sample)
-    |
-    v
-Select preferred voice
-    |
-    v
-Generate final speech
+```mermaid
+flowchart TD
+    A[Select Target Language] --> B[Filter by Gender]
+    B --> C[Audition Voice: 3s Native Audio Sample]
+    C --> D[Select Preferred Studio Model]
+    D --> E[Synthesize Final Speech]
 ```
 
 Preview audio is cached locally to minimize repeated network requests and reduce perceived latency.
@@ -122,22 +114,17 @@ Example:
 
 This allows users to write Hindi naturally using a standard Latin keyboard while still generating correctly scripted Hindi speech.
 
-The translation pipeline separates:
+![Neural Translation and Hinglish Transliteration](docs/screenshots/02_neural_translation.png)
 
-```text
-Language Detection
-        |
-        v
-Script Detection
-        |
-        v
-Romanized Indic Transliteration
-        |
-        v
-Translation
-        |
-        v
-Speech Synthesis
+```mermaid
+flowchart TD
+    A[Raw Input Script] --> B{Script Detection}
+    B -->|Latin Script with Indic Phonetics| C[Hinglish Detection Pipeline]
+    C --> D[Phonetic Devanagari Transliteration]
+    B -->|Standard Script| E[Cross-Lingual Neural Translation]
+    D --> F[SSML Prompt Composition]
+    E --> F
+    F --> G[Neural Vocoder Synthesis]
 ```
 
 Transliteration and translation are intentionally treated as separate operations.
@@ -210,6 +197,8 @@ Every generated audio asset can be persisted locally. The Library provides:
 - Direct playback and MP3 download
 - Granular record deletion
 
+![Audio Generation Library](docs/screenshots/03_audio_library.png)
+
 Metadata is stored using SQLite with indexed timestamp ordering. Generated audio remains associated with its original synthesis configuration, allowing historical results to be reproduced and inspected.
 
 ---
@@ -219,6 +208,8 @@ Metadata is stored using SQLite with indexed timestamp ordering. Generated audio
 VOX//PROTOCOL includes an automated performance benchmark suite designed to measure speech synthesis efficiency across configurable test sets.
 
 The benchmark runner supports controlled test batches, including 5, 10, 20, and 50 to 100 sample workloads.
+
+![Telemetry and Benchmark Evaluation Suite](docs/screenshots/04_benchmarks_telemetry.png)
 
 Measured telemetry includes:
 
@@ -252,70 +243,65 @@ Because speech synthesis is performed through the Microsoft Edge neural speech s
 
 ## System Architecture
 
-```text
-                         VOX//PROTOCOL
-                               |
-                               v
-                    +----------------------+
-                    |   Browser Workstation|
-                    |                      |
-                    |  HTML5               |
-                    |  Vanilla JavaScript  |
-                    |  Canvas Waveform     |
-                    +----------+-----------+
-                               |
-                               | HTTPS / JSON
-                               v
-                    +----------------------+
-                    |    FastAPI ASGI Core |
-                    |                      |
-                    |  Request Validation  |
-                    |  Voice Management    |
-                    |  Translation         |
-                    |  Generation          |
-                    |  History             |
-                    |  Analytics           |
-                    |  Benchmarking        |
-                    +-----+-----------+----+
-                          |           |
-             +------------+           +----------------+
-             |                                         |
-             v                                         v
-    +----------------------+                  +------------------+
-    | Language Pipeline    |                  | SQLite Storage   |
-    |                      |                  |                  |
-    | Language Detection   |                  | Generations      |
-    | Script Detection     |                  | Voice Metadata   |
-    | Transliteration      |                  | Telemetry        |
-    | Translation          |                  | History          |
-    +----------+-----------+                  +---------+--------+
-               |                                        |
-               v                                        |
-    +----------------------+                            |
-    | Neural TTS Provider  |                            |
-    |                      |                            |
-    | Microsoft Edge       |                            |
-    | Neural Speech Engine |                            |
-    +----------+-----------+                            |
-               |                                        |
-               v                                        |
-    +----------------------+                            |
-    | Audio Processing     |                            |
-    |                      |                            |
-    | MP3 Generation       |                            |
-    | Duration Analysis    |                            |
-    | Audio Metadata       |                            |
-    +----------+-----------+                            |
-               |                                        |
-               +--------------------+-------------------+
-                                    |
-                                    v
-                         +----------------------+
-                         | Generated Audio Store|
-                         |                      |
-                         | MP3 Assets           |
-                         | Preview Cache        |
-                         +----------------------+
+### Component Hierarchy
+
+```mermaid
+graph TD
+    subgraph Client ["Client Presentation Layer"]
+        A["Browser Workstation (HTML5 / Vanilla JS)"]
+        B["Interactive Canvas Waveform (60 FPS)"]
+        C["Tactile Acoustic Controls & Voice Catalog"]
+    end
+
+    subgraph API ["FastAPI ASGI Application Core"]
+        D["REST Endpoints (/api/voices, /api/generate)"]
+        E["Request Validation & Model Routing"]
+        F["Real-Time Telemetry & Benchmark Engine"]
+    end
+
+    subgraph Pipeline ["Language & Transliteration Layer"]
+        G["Script & Unicode Boundary Detection"]
+        H["Hinglish Phonetic Transliteration (Input Tools API)"]
+        I["Multi-Gateway Neural Translation (Failover Pool)"]
+    end
+
+    subgraph Engine ["Audio Synthesis & Persistence"]
+        J["Microsoft Edge Neural Vocoder Core"]
+        K["Audio Buffer Encoder (24kHz MP3)"]
+        L["SQLite Database Layer (Generations & Telemetry)"]
+        M["Local Media Storage (/output, /data/previews)"]
+    end
+
+    Client -->|HTTPS REST / WebSocket| API
+    API --> Pipeline
+    Pipeline --> Engine
+    Engine -->|MP3 Audio Stream| Client
+```
+
+### Synthesis Lifecycle Dataflow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant Frontend as Browser Workstation
+    participant API as FastAPI Backend
+    participant Pipeline as Transliteration Engine
+    participant TTS as Neural Vocoder Core
+    participant DB as SQLite Storage
+
+    User->>Frontend: Enter script & select voice model
+    Frontend->>API: POST /api/translate
+    API->>Pipeline: Detect script & transliterate/translate
+    Pipeline-->>API: Normalized native text
+    API-->>Frontend: Real-time translation preview
+    User->>Frontend: Trigger speech synthesis (Ctrl+Enter)
+    Frontend->>API: POST /api/generate (text, voice, speed, pitch)
+    API->>TTS: Stream SSML acoustic payload
+    TTS-->>API: 24kHz neural audio buffer
+    API->>DB: Record latency, RTF, character throughput
+    API-->>Frontend: SynthesisResponse (audio URL & telemetry)
+    Frontend->>User: Playback with interactive Canvas waveform
 ```
 
 ---

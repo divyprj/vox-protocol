@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VOX//PROTOCOL — Neural Voice Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="dark-theme">
+  <div class="app-layout">
+    
+    <!-- Top Navigation Header -->
+    <header class="top-nav">
+      <div class="brand">
+        <div class="logo-mark">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20M17 5v14M7 9v6M22 10v4M2 10v4"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">VOX//PROTOCOL</span>
+          <span class="brand-subtitle">NEURAL VOICE STUDIO</span>
+        </div>
+      </div>
+
+      <nav class="nav-tabs">
+        <button class="nav-tab active" data-tab="studio">
+          <i data-lucide="mic"></i>
+          <span>Studio</span>
+        </button>
+        <button class="nav-tab" data-tab="library">
+          <i data-lucide="folder-audio"></i>
+          <span>Library</span>
+          <span class="badge" id="library-count-badge">0</span>
+        </button>
+        <button class="nav-tab" data-tab="analytics">
+          <i data-lucide="bar-chart-2"></i>
+          <span>Analytics & Benchmarks</span>
+        </button>
+      </nav>
+
+      <div class="nav-actions">
+        <div class="engine-badge">
+          <span class="status-dot"></span>
+          <span class="engine-text">EDGE NEURAL v2.4</span>
+        </div>
+        <a href="/docs" target="_blank" class="nav-link-btn" title="Open API Documentation">
+          <i data-lucide="file-code"></i>
+          <span>API Docs</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Main Dynamic Content Workspace -->
+    <main class="main-content">
+      
+      <!-- ==================== VIEW 1: STUDIO ==================== -->
+      <section id="view-studio" class="tab-view active">
+        <div class="studio-grid">
+          
+          <!-- Left Column: Script Editor & Controls -->
+          <div class="studio-pane editor-pane">
+            <div class="pane-header">
+              <div class="pane-title">
+                <i data-lucide="edit-3"></i>
+                <h2>Script Editor</h2>
+              </div>
+              <div class="header-controls">
+                <div class="auto-translate-toggle-wrap">
+                  <label class="toggle-switch-label" title="Automatically translate your script to match the selected voice's language">
+                    <span class="toggle-switch-text">Auto-Translate</span>
+                    <input type="checkbox" id="auto-translate-toggle" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                  <span id="detected-lang-badge" class="detected-chip" title="Source Language Detection">Auto-Detect</span>
+                </div>
+                <div class="template-selector-wrap">
+                  <label for="template-dropdown">Preset:</label>
+                  <select id="template-dropdown">
+                    <option value="">Load Template...</option>
+                    <option value="tech_explainer">⚡ Tech Architecture Explainer</option>
+                    <option value="saas_promo">🚀 SaaS Product Launch</option>
+                    <option value="hindi_dialogue">🇮🇳 Hindi AI Assistant</option>
+                    <option value="customer_agent">🎧 Omnichannel Support Agent</option>
+                    <option value="audiobook_epic">📖 Narrative Audio Epic</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="editor-container">
+              <textarea id="text-input" placeholder="Type or paste your script here (e.g. 'mera naam divyansh hai' or any text in English, Hindi, Spanish, French, German, Japanese, Chinese)..." rows="9"></textarea>
+              <div class="editor-footer">
+                <div class="char-counter">
+                  <span id="char-count">0</span> / 5,000 characters
+                  <span class="separator">•</span>
+                  <span id="word-count">0</span> words
+                </div>
+                <button id="clear-text-btn" class="text-btn">Clear</button>
+              </div>
+            </div>
+
+            <!-- Intelligent Translation Preview Card -->
+            <div id="translation-preview-card" class="translation-preview-card hidden">
+              <div class="trans-header">
+                <div class="trans-title">
+                  <i data-lucide="languages"></i>
+                  <span id="trans-target-label">SPANISH · AUTO-TRANSLATED</span>
+                  <span id="trans-pipeline-tag" class="pipeline-chip">Hinglish → Spanish</span>
+                </div>
+                <div class="trans-actions">
+                  <button id="toggle-original-btn" class="trans-action-pill" title="Toggle between translated text and original script">
+                    <i data-lucide="shuffle"></i>
+                    <span id="toggle-original-text">Use Original</span>
+                  </button>
+                  <button id="copy-trans-btn" class="trans-action-pill" title="Copy translated text">
+                    <i data-lucide="copy"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="trans-body">
+                <div id="trans-text" class="trans-text" contenteditable="true" spellcheck="false" title="Click to edit or adjust translation"></div>
+                <div id="trans-loading-overlay" class="trans-loading-overlay hidden">
+                  <div class="spinner-mini"></div>
+                  <span>Translating script...</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Voice Tuning Sliders -->
+            <div class="tuning-section">
+              <div class="tuning-title">
+                <i data-lucide="sliders"></i>
+                <span>Acoustic Parameters</span>
+                <button id="reset-tuning-btn" class="reset-btn" title="Reset to standard defaults">
+                  <i data-lucide="rotate-ccw"></i>
+                </button>
+              </div>
+
+              <div class="slider-grid">
+                <!-- Speed -->
+                <div class="slider-control">
+                  <div class="slider-label-row">
+                    <label for="speed-slider">Speed / Pacing</label>
+                    <span class="slider-val" id="speed-val">1.0x</span>
+                  </div>
+                  <input type="range" id="speed-slider" min="0.5" max="2.0" step="0.05" value="1.0">
+                  <div class="slider-ticks">
+                    <span>0.5x</span>
+                    <span>1.0x</span>
+                    <span>2.0x</span>
+                  </div>
+                </div>
+
+                <!-- Pitch -->
+                <div class="slider-control">
+                  <div class="slider-label-row">
+                    <label for="pitch-slider">Pitch Shift</label>
+                    <span class="slider-val" id="pitch-val">0 Hz</span>
+                  </div>
+                  <input type="range" id="pitch-slider" min="-50" max="50" step="1" value="0">
+                  <div class="slider-ticks">
+                    <span>-50Hz</span>
+                    <span>0Hz</span>
+                    <span>+50Hz</span>
+                  </div>
+                </div>
+
+                <!-- Volume -->
+                <div class="slider-control">
+                  <div class="slider-label-row">
+                    <label for="volume-slider">Volume Gain</label>
+                    <span class="slider-val" id="volume-val">100%</span>
+                  </div>
+                  <input type="range" id="volume-slider" min="0" max="100" step="5" value="100">
+                  <div class="slider-ticks">
+                    <span>0%</span>
+                    <span>50%</span>
+                    <span>100%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Generate CTA & Manual Translate Button -->
+            <div class="action-footer">
+              <div class="shortcut-hint">
+                <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to synthesize
+              </div>
+              <div class="action-buttons-group">
+                <button id="manual-translate-btn" class="btn btn-secondary hidden" title="Translate script to selected voice language">
+                  <i data-lucide="languages"></i>
+                  <span id="manual-translate-label">Translate</span>
+                </button>
+                <button id="generate-btn" class="btn btn-primary">
+                  <i data-lucide="sparkles" id="generate-icon"></i>
+                  <span id="generate-btn-text">Synthesize Speech</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Voice Catalog & Active Audio Player -->
+          <div class="studio-pane voice-player-pane">
+            
+            <!-- Voice Catalog -->
+            <div class="pane-header">
+              <div class="pane-title">
+                <i data-lucide="users"></i>
+                <h2>Studio Voice Catalog</h2>
+              </div>
+              <div class="voice-filters">
+                <div class="search-box">
+                  <i data-lucide="search"></i>
+                  <input type="text" id="voice-search-input" placeholder="Search voices...">
+                </div>
+              </div>
+            </div>
+
+            <!-- Language & Gender Filter Tabs -->
+            <div class="filter-toolbar">
+              <div class="lang-pills" id="lang-pills">
+                <button class="pill active" data-lang="all">All Locales</button>
+                <button class="pill" data-lang="English">🇺🇸/🇬🇧 English</button>
+                <button class="pill" data-lang="Hindi">🇮🇳 Hindi</button>
+                <button class="pill" data-lang="Spanish">🇪🇸 Spanish</button>
+                <button class="pill" data-lang="French">🇫🇷 French</button>
+                <button class="pill" data-lang="German">🇩🇪 German</button>
+                <button class="pill" data-lang="Japanese">🇯🇵 Japanese</button>
+                <button class="pill" data-lang="Mandarin">🇨🇳 Mandarin</button>
+              </div>
+              <div class="gender-toggle">
+                <button class="gender-btn active" data-gender="all">All</button>
+                <button class="gender-btn" data-gender="Female">♀ Female</button>
+                <button class="gender-btn" data-gender="Male">♂ Male</button>
+              </div>
+            </div>
+
+            <!-- Voice Cards Scrollable Container -->
+            <div class="voice-cards-scroll" id="voice-cards-container">
+              <div class="loading-state">
+                <div class="spinner"></div>
+                <p>Loading neural voice models...</p>
+              </div>
+            </div>
+
+            <!-- Live Output Audio Player & Workstation -->
+            <div class="active-player-card" id="active-player-card">
+              <div class="player-top">
+                <div class="audio-meta">
+                  <div class="audio-badge" id="player-lang-badge">🇺🇸 English (US)</div>
+                  <h3 id="player-title">No Audio Generated Yet</h3>
+                  <div class="audio-specs">
+                    <span id="player-voice-name">Select voice & synthesize</span>
+                    <span class="dot">•</span>
+                    <span id="player-specs">-- ms latency</span>
+                  </div>
+                </div>
+                <div class="player-quick-actions">
+                  <button id="copy-text-btn" class="icon-action-btn" title="Copy script text">
+                    <i data-lucide="copy"></i>
+                  </button>
+                  <button id="download-mp3-btn" class="icon-action-btn primary" title="Download MP3 Audio" disabled>
+                    <i data-lucide="download"></i>
+                    <span>MP3</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Interactive Waveform Visualizer Canvas -->
+              <div class="waveform-box">
+                <canvas id="waveform-canvas"></canvas>
+                <audio id="main-audio-element" preload="auto"></audio>
+              </div>
+
+              <!-- Playback Controls -->
+              <div class="playback-bar">
+                <button id="play-pause-btn" class="btn-circle-play" disabled>
+                  <i data-lucide="play" id="play-icon"></i>
+                </button>
+                <div class="time-readout">
+                  <span id="curr-time">00:00</span> / <span id="total-time">00:00</span>
+                </div>
+                <div class="scrubber-track" id="scrubber-track">
+                  <div class="scrubber-progress" id="scrubber-progress"></div>
+                </div>
+                <div class="volume-mute-btn" id="player-mute-btn" title="Toggle Mute">
+                  <i data-lucide="volume-2" id="mute-icon"></i>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== VIEW 2: LIBRARY (HISTORY) ==================== -->
+      <section id="view-library" class="tab-view">
+        <div class="library-container">
+          <div class="section-header">
+            <div>
+              <h2>Audio Generation Library</h2>
+              <p class="subtitle">Access and download all past synthesized neural speech clips.</p>
+            </div>
+            <div class="library-search-wrap">
+              <div class="search-box">
+                <i data-lucide="search"></i>
+                <input type="text" id="library-search" placeholder="Search transcript text or voices...">
+              </div>
+            </div>
+          </div>
+
+          <div class="table-card">
+            <div class="table-responsive">
+              <table class="data-table" id="history-table">
+                <thead>
+                  <tr>
+                    <th style="width: 45px;"></th>
+                    <th>Transcript</th>
+                    <th>Voice</th>
+                    <th>Locale</th>
+                    <th>Gender</th>
+                    <th>Duration</th>
+                    <th>Created</th>
+                    <th style="width: 120px; text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="history-tbody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+            <div id="library-empty-state" class="empty-state hidden">
+              <i data-lucide="inbox"></i>
+              <h3>No generations recorded yet</h3>
+              <p>Go to the Studio tab and synthesize your first neural voice clip!</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== VIEW 3: ANALYTICS & BENCHMARKS ==================== -->
+      <section id="view-analytics" class="tab-view">
+        <div class="analytics-container">
+          <div class="section-header">
+            <div>
+              <h2>Engine Telemetry & Efficiency Benchmarks</h2>
+              <p class="subtitle">Live performance metrics, Real-Time Factor (RTF) ratings, and multi-lingual evaluation.</p>
+            </div>
+            <div class="benchmark-action-wrap">
+              <label for="benchmark-samples-select">Benchmark Size:</label>
+              <select id="benchmark-samples-select" class="sample-select">
+                <option value="5">Quick Sweep (5 samples)</option>
+                <option value="10" selected>Standard Sweep (10 samples)</option>
+                <option value="20">Full Multilingual Suite (20 samples)</option>
+              </select>
+              <button id="run-benchmark-btn" class="btn btn-accent">
+                <i data-lucide="zap"></i>
+                <span>Run Benchmark Evaluation</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Key Metrics Grid -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-icon"><i data-lucide="activity"></i></div>
+              <div class="metric-info">
+                <div class="metric-label">Mean Latency</div>
+                <div class="metric-value" id="metric-latency">-- ms</div>
+                <div class="metric-trend positive">Instant Edge Synthesis</div>
+              </div>
+            </div>
+
+            <div class="metric-card highlight">
+              <div class="metric-icon"><i data-lucide="cpu"></i></div>
+              <div class="metric-info">
+                <div class="metric-label">Real-Time Factor (RTF)</div>
+                <div class="metric-value" id="metric-rtf">-- x</div>
+                <div class="metric-trend positive" id="metric-speedup">-- Faster than real-time</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon"><i data-lucide="file-audio"></i></div>
+              <div class="metric-info">
+                <div class="metric-label">Total Audio Generated</div>
+                <div class="metric-value" id="metric-audio-seconds">0.0 s</div>
+                <div class="metric-sub" id="metric-total-generations">0 sessions</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon"><i data-lucide="type"></i></div>
+              <div class="metric-info">
+                <div class="metric-label">Characters Processed</div>
+                <div class="metric-value" id="metric-chars">0</div>
+                <div class="metric-trend positive">100% Neural Fidelity</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Benchmark Evaluation Results Box -->
+          <div class="benchmark-suite-card">
+            <div class="card-header">
+              <div class="header-left">
+                <i data-lucide="award"></i>
+                <h3>Automated Model Evaluation Results</h3>
+              </div>
+              <div class="header-right" id="benchmark-status-badge">
+                <span class="status-chip ready">Ready to run</span>
+              </div>
+            </div>
+
+            <!-- Progress bar -->
+            <div id="benchmark-progress-bar-wrap" class="progress-bar-wrap hidden">
+              <div class="progress-bar-fill" id="benchmark-progress-fill"></div>
+            </div>
+
+            <!-- Benchmark Results Summary Cards -->
+            <div class="eval-summary-strip hidden" id="benchmark-summary-strip">
+              <div class="eval-stat">
+                <span class="label">Evaluated Prompts</span>
+                <span class="val" id="bench-sample-count">--</span>
+              </div>
+              <div class="eval-stat">
+                <span class="label">Average Latency</span>
+                <span class="val" id="bench-mean-lat">-- ms</span>
+              </div>
+              <div class="eval-stat">
+                <span class="label">Global RTF</span>
+                <span class="val accent" id="bench-rtf">--</span>
+              </div>
+              <div class="eval-stat">
+                <span class="label">Speedup Ratio</span>
+                <span class="val" id="bench-speedup">--</span>
+              </div>
+              <div class="eval-stat">
+                <span class="label">Throughput</span>
+                <span class="val" id="bench-throughput">-- chars/sec</span>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table" id="benchmark-table">
+                <thead>
+                  <tr>
+                    <th style="width: 50px;">ID</th>
+                    <th>Test Prompt</th>
+                    <th>Locale / Language</th>
+                    <th>Voice Model</th>
+                    <th>Audio Duration</th>
+                    <th>Synthesis Latency</th>
+                    <th>RTF</th>
+                    <th>Speedup</th>
+                  </tr>
+                </thead>
+                <tbody id="benchmark-tbody">
+                  <tr>
+                    <td colspan="8" class="text-center text-muted" style="padding: 30px;">
+                      Click <strong>"Run Benchmark Evaluation"</strong> above to benchmark latency, RTF, and multilingual generation efficiency across diverse test prompts.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Global Floating Audio Preview Player -->
+    <audio id="global-preview-audio" preload="none"></audio>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

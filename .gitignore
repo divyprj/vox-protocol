@@ -47,6 +47,9 @@ data/*.db-journal
 results/
 dataset_benchmark/
 stt_benchmark/
+transcribe.py
+run_benchmark.py
+tests/
 
 # IDE / OS Files
 .vscode/

@@ -123,7 +123,7 @@ Instantly terminates backend processes and frees port 8000 cleanly.
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                 FRONTEND SPA (HTML5 / CSS / JS)             │
-│   • Apple Pro Audio UI  • Waveform Visualizer (Canvas API)  │
+│   • Dark Slate Workstation  • Waveform Visualizer (Canvas)   │
 │   • Studio Voice Cards  • Library Tab • Analytics Benchmark │
 └──────────────────────────────▲──────────────────────────────┘
                                │ HTTP REST API (port 8000 / $PORT)

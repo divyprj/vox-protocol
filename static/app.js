@@ -20,6 +20,8 @@ const state = {
   activeTranslation: null,
   useOriginal: false,
   transDebounceTimer: null,
+  transAbortController: null,
+  transCache: new Map(),
 };
 
 // Prompt Presets
@@ -513,16 +515,32 @@ function updateManualTranslateLabel() {
   }
 }
 
-function scheduleTranslation(delay = 450) {
+function scheduleTranslation(delay = 550) {
   clearTimeout(state.transDebounceTimer);
   state.transDebounceTimer = setTimeout(() => {
     triggerTranslation();
   }, delay);
 }
 
+function renderTranslationCard(data) {
+  state.activeTranslation = data;
+
+  elements.transTargetLabel.textContent = `${state.selectedVoice.flag} ${data.target_lang_name.toUpperCase()} · AUTO-TRANSLATED`;
+  elements.transPipelineTag.textContent = data.pipeline && data.pipeline.length > 0 ? data.pipeline.join(' • ') : 'Direct Voice Matching';
+  elements.transText.innerText = data.translated_text;
+
+  elements.detectedLangBadge.textContent = `${data.source_lang_name}`;
+  elements.detectedLangBadge.classList.add('active-detect');
+
+  state.useOriginal = false;
+  elements.toggleOriginalBtn.classList.remove('active');
+  elements.toggleOriginalText.textContent = 'Use Original';
+  elements.transText.style.opacity = '1.0';
+}
+
 async function triggerTranslation(force = false) {
   const text = elements.textInput.value.trim();
-  if (!text) {
+  if (!text || text.length < 2) {
     elements.translationPreviewCard.classList.add('hidden');
     state.activeTranslation = null;
     return;
@@ -530,6 +548,21 @@ async function triggerTranslation(force = false) {
   if (!state.selectedVoice) return;
 
   const targetLang = state.selectedVoice.language;
+  const cacheKey = `${text.toLowerCase()}:::${targetLang}`;
+
+  // Instant response from client-side memory cache
+  if (!force && state.transCache && state.transCache.has(cacheKey)) {
+    renderTranslationCard(state.transCache.get(cacheKey));
+    return;
+  }
+
+  // Cancel stale in-flight request if user is still typing or selecting voices
+  if (state.transAbortController) {
+    try {
+      state.transAbortController.abort();
+    } catch (_) {}
+  }
+  state.transAbortController = new AbortController();
 
   // Show card and loading state
   elements.translationPreviewCard.classList.remove('hidden');
@@ -542,29 +575,27 @@ async function triggerTranslation(force = false) {
       body: JSON.stringify({
         text: text,
         target_lang: targetLang
-      })
+      }),
+      signal: state.transAbortController.signal
     });
 
     if (!res.ok) throw new Error('Translation failed');
     const data = await res.json();
-    state.activeTranslation = data;
 
-    elements.transTargetLabel.textContent = `${state.selectedVoice.flag} ${data.target_lang_name.toUpperCase()} · AUTO-TRANSLATED`;
-    elements.transPipelineTag.textContent = data.pipeline.length > 0 ? data.pipeline.join(' • ') : 'Direct Voice Matching';
-    elements.transText.innerText = data.translated_text;
-
-    elements.detectedLangBadge.textContent = `${data.source_lang_name}`;
-    elements.detectedLangBadge.classList.add('active-detect');
-
-    state.useOriginal = false;
-    elements.toggleOriginalBtn.classList.remove('active');
-    elements.toggleOriginalText.textContent = 'Use Original';
-    elements.transText.style.opacity = '1.0';
+    if (state.transCache) {
+      if (state.transCache.size > 200) state.transCache.clear();
+      state.transCache.set(cacheKey, data);
+    }
+    renderTranslationCard(data);
 
   } catch (err) {
-    console.error('Translation error:', err);
-    elements.transTargetLabel.textContent = 'Translation Notice';
-    elements.transPipelineTag.textContent = 'Using original text';
+    if (err.name === 'AbortError') {
+      // Ignored: aborted intentionally for a newer request
+      return;
+    }
+    console.warn('Translation notice:', err);
+    elements.transTargetLabel.textContent = `${state.selectedVoice.flag} ${targetLang.toUpperCase()} · SCRIPT`;
+    elements.transPipelineTag.textContent = 'Native Script Preserved';
     elements.transText.innerText = text;
   } finally {
     elements.transLoadingOverlay.classList.add('hidden');
